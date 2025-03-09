@@ -15,6 +15,7 @@ def index():
         app_dict["name"] = result[str(app_id)]['data']['name']
         app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
         app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
+        app_dict["link"] = "/app/" + str(app_id)
         app_list.append(app_dict)
     return render_template("index.html", app_list=app_list)
 
@@ -22,6 +23,8 @@ def index():
 def get_app_info(app_id):
     url = "https://store.steampowered.com/api/appdetails?appids="
     url_2 = "https://store.steampowered.com/api/dlcforapp/?appid="
+    url_3 = "/reviews/"
+    review_url = url_3 + str(app_id)
     result = json.loads(requests.get(url + str(app_id)).content)
     result_2 = json.loads(requests.get(url_2 + str(app_id)).content)
     app_dict = {}
@@ -33,7 +36,7 @@ def get_app_info(app_id):
         app_dict["dlc_price_currency"] = result_2['dlc'][0]['price_overview']['currency']
         app_dict["dlc_price_value"] = result_2['dlc'][0]['price_overview']['final']
     app_dict["pc_requirements"] = result[str(app_id)]['data']['pc_requirements']['recommended']
-    return render_template("app_info.html", app_dict=app_dict)
+    return render_template("app_info.html", app_dict=app_dict, review_url=review_url)
 
 @app.route("/histogram/<int:app_id>")
 def histogram(app_id):

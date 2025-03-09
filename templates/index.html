@@ -15,7 +15,9 @@
     </tr>
     {% for app in app_list %}
     <tr>
-        <td>{{app.name}}</td>
+        <td>
+            <a href="{{app.link}}">{{app.name}}</a>
+        </td>
         <td>{{app.currency}}</td>
         <td>{{app.price}}</td>
     </tr>
