@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+<body>
+<h1>App info</h1>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>DLC</th>
+        <th>DLC price</th>
+        <th>PC Requirements</th>
+    </tr>
+    <tr>
+        <td>{{app_dict.name}}</td>
+        <td>{{app_dict.currency}}<br>
+            {{app_dict.price}}
+        </td>
+        <td>{{app_dict.dlc}}</td>
+         <td>
+            {{app_dict.dlc_price_currency}}<br>
+            {{app_dict.dlc_price_value}}
+        </td>
+        <td>{{app_dict.pc_requirements}}</td>
+    </tr>
+</table>
+</body>
+</html>
