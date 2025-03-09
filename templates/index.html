@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+</head>
+<body>
+<h1>Steam Website</h1>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Currency</th>
+        <th>Price</th>
+    </tr>
+    {% for app in app_list %}
+    <tr>
+        <td>{{app.name}}</td>
+        <td>{{app.currency}}</td>
+        <td>{{app.price}}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
