@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Line Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart"></canvas>
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ date_list | tojson }},
+                datasets: [{
+                    label: 'Random Data',
+                    data: {{ roll_up_list | tojson }},
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false
+                }, {
+                    label: 'Random Data',
+                    data: {{ roll_down_list | tojson }},
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

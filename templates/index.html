@@ -10,16 +10,12 @@
 <table>
     <tr>
         <th>Name</th>
-        <th>Currency</th>
-        <th>Price</th>
     </tr>
     {% for app in app_list %}
     <tr>
         <td>
             <a href="{{app.link}}">{{app.name}}</a>
         </td>
-        <td>{{app.currency}}</td>
-        <td>{{app.price}}</td>
     </tr>
     {% endfor %}
 </table>

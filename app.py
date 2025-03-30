@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import requests
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -24,6 +25,9 @@ def get_app_info(app_id):
     url = "https://store.steampowered.com/api/appdetails?appids="
     url_2 = "https://store.steampowered.com/api/dlcforapp/?appid="
     url_3 = "/reviews/"
+    url_4 = "/linegraph/"
+    overall_score_url = url_4 + str(app_id) + "/monthly"
+    recent_score_url = url_4 + str(app_id) + "/recent"
     review_url = url_3 + str(app_id)
     result = json.loads(requests.get(url + str(app_id)).content)
     result_2 = json.loads(requests.get(url_2 + str(app_id)).content)
@@ -36,12 +40,33 @@ def get_app_info(app_id):
         app_dict["dlc_price_currency"] = result_2['dlc'][0]['price_overview']['currency']
         app_dict["dlc_price_value"] = result_2['dlc'][0]['price_overview']['final']
     app_dict["pc_requirements"] = result[str(app_id)]['data']['pc_requirements']['recommended']
-    return render_template("app_info.html", app_dict=app_dict, review_url=review_url)
+    return render_template("app_info.html", app_dict=app_dict, review_url=review_url, overall_score_url=overall_score_url, recent_score_url=recent_score_url)
 
-@app.route("/histogram/<int:app_id>")
-def histogram(app_id):
+@app.route("/linegraph/<int:app_id>/monthly")
+def line_graph(app_id):
     url = "https://store.steampowered.com/appreviewhistogram/"
     result = json.loads(requests.get(url + str(app_id)).content)
+    date_list = []
+    roll_up_list = []
+    roll_down_list = []
+    for i in result["results"]["rollups"]:
+        date_list.append(datetime.fromtimestamp(i["date"]).strftime('%Y-%m-%d'))
+        roll_up_list.append(i["recommendations_up"])
+        roll_down_list.append(i["recommendations_down"])
+    return render_template("chart.html", date_list=date_list, roll_up_list=roll_up_list, roll_down_list=roll_down_list)
+
+@app.route("/linegraph/<int:app_id>/recent")
+def line_graph_recent(app_id):
+    url = "https://store.steampowered.com/appreviewhistogram/"
+    result = json.loads(requests.get(url + str(app_id)).content)
+    date_list = []
+    roll_up_list = []
+    roll_down_list = []
+    for i in result["results"]["recent"]:
+        date_list.append(datetime.fromtimestamp(i["date"]).strftime('%Y-%m-%d'))
+        roll_up_list.append(i["recommendations_up"])
+        roll_down_list.append(i["recommendations_down"])
+    return render_template("chart.html", date_list=date_list, roll_up_list=roll_up_list, roll_down_list=roll_down_list)
 
 @app.route("/reviews/<int:app_id>")
 def get_reviews(app_id):
