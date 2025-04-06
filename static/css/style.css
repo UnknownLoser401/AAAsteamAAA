@@ -58,3 +58,60 @@ td {
         padding: 10px;
     }
 }
+
+.search-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.search-box {
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-box input[type="text"] {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 18px;
+    border: 2px solid #ccc;
+    border-radius: 30px;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.search-box input[type="text"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+}
+
+.search-box button {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #007bff;
+    padding: 5px;
+}
+
+.search-box button:hover {
+    color: #0056b3;
+}
+
+/* Keep previous table and results container styles */
+.results-container {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 30px;
+}
+
+#error{
+    text-align: center;
+}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import requests
 import json
 from datetime import datetime
@@ -20,27 +20,43 @@ def index():
         app_list.append(app_dict)
     return render_template("index.html", app_list=app_list)
 
+@app.route("/search/<string:keyword>")
+def search(keyword):
+    url = "http://api.steampowered.com/iSteamApps/GetAppList/v2/"
+    result = json.loads(requests.get(url).content)
+    matching_apps = []
+
+    for app in result['applist']['apps']:
+        if keyword.lower() in app["name"].lower():  # Case-insensitive search
+            matching_apps.append({"name": app["name"], "app_id": app["appid"]})
+    print(matching_apps)
+    return jsonify(matching_apps)
+
+
 @app.route("/app/<int:app_id>")
 def get_app_info(app_id):
-    url = "https://store.steampowered.com/api/appdetails?appids="
-    url_2 = "https://store.steampowered.com/api/dlcforapp/?appid="
-    url_3 = "/reviews/"
-    url_4 = "/linegraph/"
-    overall_score_url = url_4 + str(app_id) + "/monthly"
-    recent_score_url = url_4 + str(app_id) + "/recent"
-    review_url = url_3 + str(app_id)
-    result = json.loads(requests.get(url + str(app_id)).content)
-    result_2 = json.loads(requests.get(url_2 + str(app_id)).content)
-    app_dict = {}
-    app_dict["name"] = result[str(app_id)]['data']['name']
-    app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
-    app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
-    if result_2["dlc"]:
-        app_dict["dlc"] = result_2['dlc'][0]['name']
-        app_dict["dlc_price_currency"] = result_2['dlc'][0]['price_overview']['currency']
-        app_dict["dlc_price_value"] = result_2['dlc'][0]['price_overview']['final']
-    app_dict["pc_requirements"] = result[str(app_id)]['data']['pc_requirements']['recommended']
-    return render_template("app_info.html", app_dict=app_dict, review_url=review_url, overall_score_url=overall_score_url, recent_score_url=recent_score_url)
+    try:
+        url = "https://store.steampowered.com/api/appdetails?appids="
+        url_2 = "https://store.steampowered.com/api/dlcforapp/?appid="
+        url_3 = "/reviews/"
+        url_4 = "/linegraph/"
+        overall_score_url = url_4 + str(app_id) + "/monthly"
+        recent_score_url = url_4 + str(app_id) + "/recent"
+        review_url = url_3 + str(app_id)
+        result = json.loads(requests.get(url + str(app_id)).content)
+        result_2 = json.loads(requests.get(url_2 + str(app_id)).content)
+        app_dict = {}
+        app_dict["name"] = result[str(app_id)]['data']['name']
+        app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
+        app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
+        if result_2["dlc"]:
+            app_dict["dlc"] = result_2['dlc'][0]['name']
+            app_dict["dlc_price_currency"] = result_2['dlc'][0]['price_overview']['currency']
+            app_dict["dlc_price_value"] = result_2['dlc'][0]['price_overview']['final']
+        app_dict["pc_requirements"] = result[str(app_id)]['data']['pc_requirements']['recommended']
+        return render_template("app_info.html", app_dict=app_dict, review_url=review_url, overall_score_url=overall_score_url, recent_score_url=recent_score_url)
+    except:
+        return render_template("error_page.html")
 
 @app.route("/linegraph/<int:app_id>/monthly")
 def line_graph(app_id):
