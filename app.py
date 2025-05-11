@@ -7,18 +7,18 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    url = "https://store.steampowered.com/api/appdetails?appids="
-    app_id_list = [1091500, 1245620, 2050650, 2124490, 739630]
-    app_list = []
-    for app_id in app_id_list:
-        app_dict = {}
-        result = json.loads(requests.get(url + str(app_id)).content)
-        app_dict["name"] = result[str(app_id)]['data']['name']
-        app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
-        app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
-        app_dict["link"] = "/app/" + str(app_id)
-        app_list.append(app_dict)
-    return render_template("index.html", app_list=app_list)
+    # url = "https://store.steampowered.com/api/appdetails?appids="
+    # app_id_list = [1091500, 1245620, 2050650, 2124490, 739630]
+    #app_list = []
+    # for app_id in app_id_list:
+    #     app_dict = {}
+    #     result = json.loads(requests.get(url + str(app_id)).content)
+    #     app_dict["name"] = result[str(app_id)]['data']['name']
+    #     app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
+    #     app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
+    #     app_dict["link"] = "/app/" + str(app_id)
+    #     app_list.append(app_dict)
+    return render_template("index.html")
 
 @app.route("/search/<string:keyword>")
 def search(keyword):
@@ -27,7 +27,7 @@ def search(keyword):
     matching_apps = []
 
     for app in result['applist']['apps']:
-        if keyword.lower() in app["name"].lower():  # Case-insensitive search
+        if keyword.lower() in app["name"].lower():
             matching_apps.append({"name": app["name"], "app_id": app["appid"]})
     print(matching_apps)
     return jsonify(matching_apps)
@@ -45,17 +45,24 @@ def get_app_info(app_id):
         review_url = url_3 + str(app_id)
         result = json.loads(requests.get(url + str(app_id)).content)
         result_2 = json.loads(requests.get(url_2 + str(app_id)).content)
+        if not result[str(app_id)]["success"]:
+            print("Success is false")
+            return render_template("error_page.html")
         app_dict = {}
         app_dict["name"] = result[str(app_id)]['data']['name']
-        app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
-        app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
+        if 'price_overview' in result[str(app_id)]['data']:
+            app_dict["currency"] = result[str(app_id)]['data']['price_overview']['currency']
+            app_dict["price"] = result[str(app_id)]['data']['price_overview']['initial']
         if result_2["dlc"]:
+            print("dlc is not empty")
             app_dict["dlc"] = result_2['dlc'][0]['name']
             app_dict["dlc_price_currency"] = result_2['dlc'][0]['price_overview']['currency']
             app_dict["dlc_price_value"] = result_2['dlc'][0]['price_overview']['final']
-        app_dict["pc_requirements"] = result[str(app_id)]['data']['pc_requirements']['recommended']
+        if "recommended" in result[str(app_id)]['data']['pc_requirements']:
+            app_dict["pc_requirements"] = result[str(app_id)]['data']['pc_requirements']['recommended']
         return render_template("app_info.html", app_dict=app_dict, review_url=review_url, overall_score_url=overall_score_url, recent_score_url=recent_score_url)
-    except:
+    except Exception as error:
+        print("Error in app: ", error)
         return render_template("error_page.html")
 
 @app.route("/linegraph/<int:app_id>/monthly")
